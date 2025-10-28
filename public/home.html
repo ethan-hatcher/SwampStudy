@@ -1,0 +1,116 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Swamp Study – Home</title>
+  <style>
+  :root {
+    --uf-blue:  #0021A5;
+    --uf-orange:#FA4616;
+    --bg:       #f0f6ff;
+    --card:     #ffffff;
+    --text:     #1b1b1b;
+  }
+
+  /* Page */
+  html, body { height: 100%; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: "Segoe UI", Arial, sans-serif;
+  }
+
+  /* Centered content column */
+  .container {
+    max-width: 720px;
+    margin: 40px auto 80px;
+    padding: 0 16px;
+  }
+
+  /* Top banner */
+  .banner {
+    background: var(--uf-blue);
+    color: white;
+    padding: 10px 0;
+    text-align: center;
+    box-shadow: 0 2px 8px rgba(0,0,0,.15);
+  }
+  .banner img {
+    max-width: 320px;
+    width: 60%;
+    height: auto;
+    display: block;
+    margin: 0 auto;
+  }
+
+  /* Heading + actions */
+  h1 {
+    color: var(--uf-blue);
+    font-size: 2rem;
+    margin: 24px 0 12px;
+  }
+  .row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+  }
+
+  /* Buttons */
+  .btn {
+    padding: 10px 14px;
+    border: none;
+    border-radius: 10px;
+    background: var(--uf-orange);
+    color: white;
+    cursor: pointer;
+    font-weight: 600;
+    box-shadow: 0 2px 6px rgba(0,0,0,.15);
+    transition: transform .05s ease, filter .15s ease;
+  }
+  .btn:hover { filter: brightness(1.05); }
+  .btn:active { transform: translateY(1px); }
+
+  /* Card */
+  .card {
+    margin-top: 18px;
+    background: var(--card);
+    padding: 18px;
+    border-radius: 14px;
+    border: 1px solid #e5ecff;
+    box-shadow: 0 6px 18px rgba(0,0,0,.08);
+    line-height: 1.5;
+  }
+</style>
+  
+</head>
+<body>
+  <div class="banner">
+    <img src="gatorbanner.png" alt="Swamp Study Header">
+  </div>
+
+  <div class="container">
+    <div class="row">
+      <h1>Welcome, <span id="user"></span> 👋</h1>
+      <button class="btn" id="logout">Log out</button>
+    </div>
+
+    <div class="card">
+      <p>Welcome to <strong>Swamp Study</strong>! You’re now logged in and connected to our backend system.</p>
+      <p>Your account info is saved in our local database (<code>users.json</code>).</p>
+    </div>
+  </div>
+
+  <script>
+    const u = localStorage.getItem("swamp_user");
+    if (!u) location.href = "/"; // no login → go back
+
+    document.getElementById("user").textContent = u;
+    document.getElementById("logout").onclick = () => {
+      localStorage.removeItem("swamp_user");
+      location.href = "/";
+    };
+  </script>
+</body>
+</html>
