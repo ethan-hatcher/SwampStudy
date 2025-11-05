@@ -51,5 +51,49 @@ app.post("/api/login", (req, res) => {
   res.json({ ok: true, username });
 });
 
+// Availability data file
+const AVAILABILITY_PATH = "./availability.json";
+if (!fs.existsSync(AVAILABILITY_PATH)) fs.writeFileSync(AVAILABILITY_PATH, "{}");
+
+function readAvailability() {
+  return JSON.parse(fs.readFileSync(AVAILABILITY_PATH, "utf-8"));
+}
+
+function writeAvailability(data) {
+  fs.writeFileSync(AVAILABILITY_PATH, JSON.stringify(data, null, 2));
+}
+
+// Get user's availability
+app.get("/api/availability/:username", (req, res) => {
+  const username = req.params.username;
+  const allAvailability = readAvailability();
+  const userAvailability = allAvailability[username] || {};
+  res.json(userAvailability);
+});
+
+// Save user's availability for a date
+app.post("/api/availability/:username", (req, res) => {
+  const username = req.params.username;
+  const { date, status } = req.body;
+
+  if (!date || !status) {
+    return res.status(400).json({ error: "date and status required" });
+  }
+
+  if (status !== "available" && status !== "unavailable") {
+    return res.status(400).json({ error: "status must be 'available' or 'unavailable'" });
+  }
+
+  const allAvailability = readAvailability();
+  if (!allAvailability[username]) {
+    allAvailability[username] = {};
+  }
+  
+  allAvailability[username][date] = status;
+  writeAvailability(allAvailability);
+  
+  res.json({ ok: true, availability: allAvailability[username] });
+});
+
 export default app;
-export { USERS_PATH };
+export { USERS_PATH, AVAILABILITY_PATH };

@@ -1,0 +1,578 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Swamp Study – Calendar</title>
+  <style>
+    :root {
+      --uf-blue:  #0021A5;
+      --uf-orange:#FA4616;
+      --bg:       #f0f6ff;
+      --card:     #ffffff;
+      --text:     #1b1b1b;
+      --available: #4CAF50;
+      --unavailable: #f44336;
+      --neutral: #e0e0e0;
+    }
+
+    html, body {
+      height: 100%;
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: "Segoe UI", Arial, sans-serif;
+    }
+
+    .banner {
+      background: var(--uf-blue);
+      color: white;
+      padding: 10px 0;
+      text-align: center;
+      box-shadow: 0 2px 8px rgba(0,0,0,.15);
+    }
+    .banner img {
+      max-width: 320px;
+      width: 60%;
+      height: auto;
+      display: block;
+      margin: 0 auto;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 40px auto 80px;
+      padding: 0 16px;
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    h1 {
+      color: var(--uf-blue);
+      font-size: 2rem;
+      margin: 0;
+    }
+
+    .nav-buttons {
+      display: flex;
+      gap: 12px;
+    }
+
+    .btn {
+      padding: 10px 14px;
+      border: none;
+      border-radius: 10px;
+      background: var(--uf-orange);
+      color: white;
+      cursor: pointer;
+      font-weight: 600;
+      box-shadow: 0 2px 6px rgba(0,0,0,.15);
+      transition: transform .05s ease, filter .15s ease;
+      text-decoration: none;
+      display: inline-block;
+    }
+    .btn:hover { filter: brightness(1.05); }
+    .btn:active { transform: translateY(1px); }
+    .btn-secondary {
+      background: var(--uf-blue);
+    }
+
+    .current-date {
+      text-align: center;
+      color: var(--uf-blue);
+      font-size: 1.1rem;
+      margin-bottom: 8px;
+      font-weight: 500;
+    }
+
+    .calendar-nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+      background: var(--card);
+      padding: 16px 20px;
+      border-radius: 14px;
+      box-shadow: 0 2px 8px rgba(0,0,0,.08);
+    }
+
+    .nav-arrow {
+      background: var(--uf-blue);
+      color: white;
+      border: none;
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      font-size: 1.5rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+      box-shadow: 0 2px 6px rgba(0,0,0,.15);
+    }
+
+    .nav-arrow:hover {
+      background: var(--uf-orange);
+      transform: scale(1.1);
+    }
+
+    .nav-arrow:active {
+      transform: scale(0.95);
+    }
+
+    .month-year-title {
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: var(--uf-blue);
+      text-align: center;
+      flex: 1;
+    }
+
+    .legend {
+      display: flex;
+      gap: 24px;
+      margin-bottom: 24px;
+      padding: 12px;
+      background: var(--card);
+      border-radius: 8px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .legend-color {
+      width: 20px;
+      height: 20px;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+    }
+
+    .calendar-container {
+      display: flex;
+      justify-content: center;
+    }
+
+    .month-card {
+      background: var(--card);
+      padding: 24px;
+      border-radius: 14px;
+      border: 1px solid #e5ecff;
+      box-shadow: 0 6px 18px rgba(0,0,0,.08);
+      width: 100%;
+      max-width: 600px;
+    }
+
+    .calendar-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .calendar-table th {
+      padding: 12px 8px;
+      text-align: center;
+      font-size: 0.9rem;
+      color: var(--uf-blue);
+      font-weight: 600;
+    }
+
+    .calendar-table td {
+      padding: 6px;
+      text-align: center;
+    }
+
+    .date-cell {
+      width: 44px;
+      height: 44px;
+      border-radius: 8px;
+      border: 2px solid transparent;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      background: var(--neutral);
+      color: var(--text);
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto;
+      font-size: 1rem;
+    }
+
+    .date-cell:hover {
+      transform: scale(1.15);
+      border-color: var(--uf-blue);
+      box-shadow: 0 2px 8px rgba(0,0,0,.2);
+    }
+
+    .date-cell.available {
+      background: var(--available);
+      color: white;
+    }
+
+    .date-cell.unavailable {
+      background: var(--unavailable);
+      color: white;
+    }
+
+    .date-cell.empty {
+      background: transparent;
+      cursor: default;
+    }
+
+    .date-cell.empty:hover {
+      transform: none;
+      border-color: transparent;
+      box-shadow: none;
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.5);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal.show {
+      display: flex;
+    }
+
+    .modal-content {
+      background: var(--card);
+      padding: 24px;
+      border-radius: 14px;
+      max-width: 400px;
+      width: 90%;
+      box-shadow: 0 10px 40px rgba(0,0,0,.3);
+    }
+
+    .modal-content h3 {
+      color: var(--uf-blue);
+      margin-top: 0;
+    }
+
+    .modal-buttons {
+      display: flex;
+      gap: 12px;
+      margin-top: 20px;
+    }
+
+    .modal-btn {
+      flex: 1;
+      padding: 12px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: filter 0.15s ease;
+    }
+
+    .modal-btn:hover {
+      filter: brightness(0.95);
+    }
+
+    .modal-btn.available {
+      background: var(--available);
+      color: white;
+    }
+
+    .modal-btn.unavailable {
+      background: var(--unavailable);
+      color: white;
+    }
+
+    .modal-btn.cancel {
+      background: var(--neutral);
+      color: var(--text);
+    }
+  </style>
+</head>
+<body>
+  <div class="banner">
+    <img src="gatorbanner.png" alt="Swamp Study Header">
+  </div>
+
+  <div class="container">
+    <div class="header">
+      <h1>📅 Calendar</h1>
+      <div class="nav-buttons">
+        <a href="/home.html" class="btn btn-secondary">Home</a>
+        <button class="btn" id="logout">Log out</button>
+      </div>
+    </div>
+
+    <div class="current-date" id="currentDate"></div>
+
+    <div class="calendar-nav">
+      <button class="nav-arrow" id="prevMonth">←</button>
+      <div class="month-year-title" id="monthYearTitle"></div>
+      <button class="nav-arrow" id="nextMonth">→</button>
+    </div>
+
+    <div class="legend">
+      <div class="legend-item">
+        <div class="legend-color" style="background: var(--available);"></div>
+        <span>Available</span>
+      </div>
+      <div class="legend-item">
+        <div class="legend-color" style="background: var(--unavailable);"></div>
+        <span>Unavailable</span>
+      </div>
+      <div class="legend-item">
+        <div class="legend-color" style="background: var(--neutral);"></div>
+        <span>Not Set</span>
+      </div>
+    </div>
+
+    <div class="calendar-container">
+      <div class="month-card" id="monthCard"></div>
+    </div>
+  </div>
+
+  <!-- Modal for date selection -->
+  <div class="modal" id="dateModal">
+    <div class="modal-content">
+      <h3 id="modalDate"></h3>
+      <p>Select availability status for this date:</p>
+      <div class="modal-buttons">
+        <button class="modal-btn available" id="setAvailable">Available</button>
+        <button class="modal-btn unavailable" id="setUnavailable">Unavailable</button>
+        <button class="modal-btn cancel" id="cancelModal">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Check authentication
+    const currentUser = localStorage.getItem("swamp_user");
+    if (!currentUser) {
+      location.href = "/";
+    }
+
+    // Get current Eastern time
+    function getEasternTime() {
+      const now = new Date();
+      const easternTime = new Date(now.toLocaleString("en-US", { timeZone: "America/New_York" }));
+      return easternTime;
+    }
+
+    let availabilityData = {};
+    let selectedDate = null;
+    let currentMonth = null;
+    let currentYear = null;
+
+    // Initialize with current Eastern time month/year
+    function initCurrentDate() {
+      const eastern = getEasternTime();
+      currentMonth = eastern.getMonth(); // 0-11
+      currentYear = eastern.getFullYear();
+      
+      // Update current date display
+      const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+      const dateStr = eastern.toLocaleDateString('en-US', { ...options, timeZone: 'America/New_York' });
+      document.getElementById("currentDate").textContent = `Today (Eastern Time): ${dateStr}`;
+    }
+
+    // Load availability data
+    async function loadAvailability() {
+      try {
+        const res = await fetch(`/api/availability/${currentUser}`);
+        if (res.ok) {
+          availabilityData = await res.json();
+        }
+      } catch (err) {
+        console.error("Error loading availability:", err);
+      }
+      renderCalendar();
+    }
+
+    // Save availability
+    async function saveAvailability(date, status) {
+      try {
+        const res = await fetch(`/api/availability/${currentUser}`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ date, status })
+        });
+        if (res.ok) {
+          const data = await res.json();
+          availabilityData = data.availability;
+          // Re-render the calendar to show the updated colors
+          renderCalendar();
+        }
+      } catch (err) {
+        console.error("Error saving availability:", err);
+        alert("Failed to save availability");
+      }
+    }
+
+    // Render calendar for single month
+    function renderCalendar() {
+      const monthCard = document.getElementById("monthCard");
+      monthCard.innerHTML = "";
+
+      const monthNames = [
+        "January", "February", "March", "April", "May", "June",
+        "July", "August", "September", "October", "November", "December"
+      ];
+
+      // Update month/year title
+      document.getElementById("monthYearTitle").textContent = 
+        `${monthNames[currentMonth]} ${currentYear}`;
+
+      const table = document.createElement("table");
+      table.className = "calendar-table";
+
+      // Header row
+      const headerRow = document.createElement("tr");
+      ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].forEach(day => {
+        const th = document.createElement("th");
+        th.textContent = day;
+        headerRow.appendChild(th);
+      });
+      table.appendChild(headerRow);
+
+      // Get first day of month and days in month
+      const firstDay = new Date(currentYear, currentMonth, 1).getDay();
+      const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+
+      // Create calendar cells
+      let currentRow = document.createElement("tr");
+
+      // Empty cells for days before month starts
+      for (let i = 0; i < firstDay; i++) {
+        const td = document.createElement("td");
+        const cell = document.createElement("div");
+        cell.className = "date-cell empty";
+        td.appendChild(cell);
+        currentRow.appendChild(td);
+      }
+
+      // Days of the month
+      for (let day = 1; day <= daysInMonth; day++) {
+        if ((firstDay + day - 1) % 7 === 0 && day > 1) {
+          table.appendChild(currentRow);
+          currentRow = document.createElement("tr");
+        }
+
+        const td = document.createElement("td");
+        const cell = document.createElement("div");
+        cell.className = "date-cell";
+        cell.textContent = day;
+        
+        const dateStr = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+        cell.dataset.date = dateStr;
+
+        // Set status if exists
+        const status = availabilityData[dateStr];
+        if (status === "available") {
+          cell.classList.add("available");
+        } else if (status === "unavailable") {
+          cell.classList.add("unavailable");
+        }
+
+        cell.onclick = () => openDateModal(dateStr);
+        td.appendChild(cell);
+        currentRow.appendChild(td);
+      }
+
+      // Fill remaining cells
+      while (currentRow.children.length < 7) {
+        const td = document.createElement("td");
+        const cell = document.createElement("div");
+        cell.className = "date-cell empty";
+        td.appendChild(cell);
+        currentRow.appendChild(td);
+      }
+      table.appendChild(currentRow);
+
+      monthCard.appendChild(table);
+    }
+
+    function updateDateCell(dateStr, status) {
+      const cell = document.querySelector(`[data-date="${dateStr}"]`);
+      if (cell) {
+        cell.classList.remove("available", "unavailable");
+        if (status === "available") {
+          cell.classList.add("available");
+        } else if (status === "unavailable") {
+          cell.classList.add("unavailable");
+        }
+      }
+    }
+
+    function openDateModal(dateStr) {
+      selectedDate = dateStr;
+      const date = new Date(dateStr);
+      const options = { year: 'numeric', month: 'long', day: 'numeric' };
+      document.getElementById("modalDate").textContent = date.toLocaleDateString('en-US', options);
+      document.getElementById("dateModal").classList.add("show");
+    }
+
+    function closeModal() {
+      document.getElementById("dateModal").classList.remove("show");
+      selectedDate = null;
+    }
+
+    function navigateMonth(direction) {
+      currentMonth += direction;
+      if (currentMonth < 0) {
+        currentMonth = 11;
+        currentYear--;
+      } else if (currentMonth > 11) {
+        currentMonth = 0;
+        currentYear++;
+      }
+      renderCalendar();
+    }
+
+    // Modal event handlers
+    document.getElementById("setAvailable").onclick = () => {
+      saveAvailability(selectedDate, "available");
+      closeModal();
+    };
+
+    document.getElementById("setUnavailable").onclick = () => {
+      saveAvailability(selectedDate, "unavailable");
+      closeModal();
+    };
+
+    document.getElementById("cancelModal").onclick = closeModal;
+
+    // Close modal on background click
+    document.getElementById("dateModal").onclick = (e) => {
+      if (e.target.id === "dateModal") closeModal();
+    };
+
+    // Navigation arrows
+    document.getElementById("prevMonth").onclick = () => navigateMonth(-1);
+    document.getElementById("nextMonth").onclick = () => navigateMonth(1);
+
+    // Logout
+    document.getElementById("logout").onclick = () => {
+      localStorage.removeItem("swamp_user");
+      location.href = "/";
+    };
+
+    // Initialize and load calendar
+    initCurrentDate();
+    loadAvailability();
+  </script>
+</body>
+</html>
