@@ -4,7 +4,7 @@ Install Node.js (LTS) from https://nodejs.org/
 
 Clone the repository:
 
-git clone https://github.com/joeljdom/SwampStudy.git
+git clone https://github.com/{USER}/SwampStudy.git
 cd SwampStudy
 
 Install dependencies:
